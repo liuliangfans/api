@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.4.11/theme-chalk/index.css" rel="stylesheet">
+	<script src="https://cdn.bootcss.com/vue/2.5.17/vue.js"></script>
+	<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="icon" href="/public/img/logo33.png" type="image/x-icon"/>
+	<title>订单列表</title>
+</head>
+<body>
+	<div id="app">
+		<template>
+			<!-- <el-button size='mini' plain style='width: 150px;margin-bottom: 10px;' @click='getData()'>刷新</el-button> -->
+			<div class="topdiv" style="border-bottom: 2px solid white;min-width: 1000px">
+				<div class="topdiv">
+					<span style="padding-right: 20px">自动刷新</span>
+					<el-switch v-model="value3" @change='switchChange'></el-switch>
+					<span style="padding-left: 10px;color:red">{{value3?'开':'关'}}</span>
+				</div>
+				<div v-if='gridData.length>0'>
+					<span class="span1038">退款中 <strong>{{a1}}</strong> </span>
+					<span class="span1038">退款成功 <strong>{{a2}}</strong> </span>
+					<span class="span1038" style="padding-right: 50px;">淘客订单 <strong>{{a3}}</strong> </span>
+					<span class="span1038">
+						<i class="fa fa-flag" style="color:#FD0000"></i>红旗 <span>{{a4}}</span> 
+					</span>
+					<span class="span1038">
+						<i class="fa fa-flag" style="color:#FDF802"></i>黄旗 <span>{{a5}}</span> 
+					</span>
+					<span class="span1038">
+						<i class="fa fa-flag" style="color:#00FD28"></i>绿旗 <span>{{a6}}</span> 
+					</span>
+					<span class="span1038">
+						<i class="fa fa-flag" style="color:#0050FC"></i>蓝旗 <span>{{a7}}</span> 
+					</span>
+					<span class="span1038">
+						<i class="fa fa-flag" style="color:#E101FD"></i>紫旗 <span>{{a8}}</span> 
+					</span>
+				</div>
+			</div>
+			<!-- <div class='posdiv'></div> -->
+			<div style="max-width: 1700px;margin: 0 auto">
+				<el-table :data="gridData" border style="width: 100%;" v-loading='loading' size='mini' 
+				:row-class-name="tableRowClassName" height='860px'>
+					    <el-table-column prop="id" label="编号" align='center' width=100px></el-table-column>
+					    <el-table-column prop="createTime" label="创建时间" align='center' min-width=200px></el-table-column>
+					    <el-table-column prop="buyerNick" label="买家旺旺"  min-width=200px :show-overflow-tooltip=true>
+					    	<template scope="scope">
+					    		{{scope.row.buyerNick}}
+					    		<el-button @click='onCopy(scope.row.buyerNick)' size='mini' type="text">复制</el-button>
+					    	</template>
+					    </el-table-column>
+					    <el-table-column prop="orderId" label="订单号" align='center' min-width=200px>
+					    	<template scope="scope">
+					    		{{scope.row.orderId}}
+					    		<el-button @click='onCopy(scope.row.orderId)' size='mini' type="text">复制</el-button>
+					    	</template>
+					    </el-table-column>
+					    <el-table-column prop="status" label="订单状态"  align='center' width=120px>
+					    	<template scope="scope">
+					    		<span v-if='scope.row.status=="交易关闭"' style="color:#FD0000">{{scope.row.status}}</span>
+					    		<span v-else-if='scope.row.status=="买家已付款"' style="color:#0050FC">{{scope.row.status}}</span>
+					    		<span v-else-if='scope.row.status=="等待买家付款"' style="color:#56AA16">{{scope.row.status}}</span>
+					    		<span v-else>{{scope.row.status}}</span>
+					    	</template>
+					    </el-table-column>
+					    <el-table-column prop="actualFee" label="实收款"  align='center' width=80px></el-table-column>
+					    <el-table-column prop="quantity" label="数量"  align='center' width=80px></el-table-column>
+					    <el-table-column prop="refund" label="退款状态"  align='center'></el-table-column>
+					    <el-table-column prop="checkStatus" label="验号状态"  align='center'>
+					    	<template scope="scope">
+					    		<span :class='scope.row.ischeck?"ischeckred":""'>{{scope.row.checkStatus}}</span>
+					    	</template>
+					    </el-table-column>
+					    <el-table-column prop="checkMemo" label="验号备注"  align='center'></el-table-column>
+					    <el-table-column prop="tbk_order" label="淘客检测"  align='center'>
+					    	<template scope="scope">
+					    		<span v-if='scope.row.tbk_order=="初检正常"' style="color:#56AA16">{{scope.row.tbk_order}}</span>
+					    		<span v-else-if='scope.row.tbk_order=="淘客订单"' style="color:#409EFF">{{scope.row.tbk_order}}</span>
+					    		<span v-else>{{scope.row.tbk_order}}</span>
+					    	</template>
+					    </el-table-column>
+					    <el-table-column prop="reBuy" label="复购"  align='center' width=80px>
+					    	<template scope="scope">
+			    			    <el-popover
+			    			      v-if='scope.row.isreBuy'
+								  placement="left"
+								  width="1555"
+								  @show='popoverShow(scope.row)'
+								  trigger="click">
+								  <el-table :data="datapopover" v-loading='loadingpopover' size='mini' 
+								  cell-class-name='poptable'
+								  header-cell-class-name='poptable'>
+								    <el-table-column prop="orderId" label="订单号" align='center' width=200px></el-table-column>
+								    <el-table-column property="buyerNick" label="旺旺" align='center'></el-table-column>
+								    <el-table-column property="actualFee" label="金额" align='center' width=80px></el-table-column>
+								    <el-table-column property="quantity" label="数量" align='center' width=80px></el-table-column>
+								    <el-table-column property="createTime" label="订单时间" align='center' width=200px></el-table-column>
+								    <el-table-column property="status" label="订单状态" align='center'></el-table-column>
+								    <el-table-column property="expressName" label="姓名" align='center'></el-table-column>
+								    <el-table-column property="expressPhone" label="电话" align='center' width=150px></el-table-column>
+								    <el-table-column property="expressAddress" label="地址" align='center' min-width=300px :show-overflow-tooltip=true></el-table-column>
+								  </el-table>
+								  <span slot="reference" class="isrebuyred">{{scope.row.reBuy}}</span>
+								</el-popover>
+								<span v-else>{{scope.row.reBuy}}</span>
+					    	</template>
+					    </el-table-column>
+					    <el-table-column prop="sellerFlag" label="旗帜标识"  align='center' width=80px>
+					    	<template scope="scope">
+					    		<i class="fa fa-flag" style="color:#FD0000" v-if='scope.row.sellerFlag==1'></i>
+					    		<i class="fa fa-flag" style="color:#FDF802" v-if='scope.row.sellerFlag==2'></i>
+					    		<i class="fa fa-flag" style="color:#00FD28" v-if='scope.row.sellerFlag==3'></i>
+					    		<i class="fa fa-flag" style="color:#0050FC" v-if='scope.row.sellerFlag==4'></i>
+					    		<i class="fa fa-flag" style="color:#E101FD" v-if='scope.row.sellerFlag==5'></i>
+					    	</template>
+					    </el-table-column>
+				</el-table>
+			</div>
+		</template>
+	</div>
+</body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.4.11/index.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+<script type="text/javascript">
+	new Vue({
+		el: '#app',
+		data: function() {
+		   return { 
+		   		loading: false,
+		   		value3: true,
+		   		t: '',
+		   		gridData: [],
+		   		loadingpopover: false,
+		   		datapopover: [],
+		   		a1: 0, // 退款中
+		   		a2: 0, // 退款成功
+		   		a3: 0, // 淘客订单
+		   		a4: 0, // 红旗
+		   		a5: 0, // 黄旗
+		   		a6: 0, // 绿旗
+		   		a7: 0, // 蓝旗
+		   		a8: 0, // 紫旗
+		   }
+		},
+		methods: {
+			tableRowClassName({row, rowIndex}) {
+		        // if (row['ischeck']) {
+		        //   return 'warning-row';
+		        // } else if (row['istbkorder']) {
+		        //   return 'success-row';
+		        // }else if (row['isreBuy']) {
+		        //   return 'success-rowrebuy';
+		        // }
+		        // return '';
+		      },
+			getData() {
+				this.loading = true
+	        	this.gridData = []
+				var _this = this;
+	    		axios({
+	    			method: 'post',
+	    			// url: "http://fanbo.com/test/my",
+	    			url: "http://www.liuliangfans.com/test/my",
+	    		}).then(function(res){
+	    			_this.loading = false
+	    			var arr = res.data
+	    			var a1 = 0;
+	    			var a2 = 0;
+	    			var a3 = 0;
+	    			var a4 = 0;
+	    			var a5 = 0;
+	    			var a6 = 0;
+	    			var a7 = 0;
+	    			var a8 = 0;
+	    			for (let e of arr) {
+	    				switch (e['tbk_check_num']) {
+	    					case 0:
+	    						e['tbk_order']='正在检测...';
+	    						break;
+	    					case 1:
+			    				switch (e['tbk_order']) {
+			    					case 0:
+			    						e['tbk_order']='初检正常';
+			    						break;
+			    					case 1:
+			    						e['tbk_order']='淘客订单';
+			    						e['istbkorder']=true;
+			    						if (e['status']!='交易关闭') {
+			    							a3++;
+				    					}
+			    						break;
+			    				}
+	    						
+	    						break;
+	    					case 2:
+	    						switch (e['tbk_order']) {
+			    					case 0:
+			    						e['tbk_order']='完全正常';
+			    						break;
+			    					case 1:
+			    						e['tbk_order']='淘客订单';
+			    						e['istbkorder']=true;
+			    						if (e['status']!='交易关闭') {
+			    							a3++;
+				    					}
+			    						break;
+	    						}
+	    						break;
+	    					default:
+	    						break;
+	    				}
+	    				
+	    				switch (e['check_num']) {
+	    					case 0:
+		    					e['checkStatus']='正在验号...';
+		    					break;
+	    					default:
+		    					switch (e['checkStatus']) {
+			    					case 0:
+				    					e['checkStatus']='正常';
+				    					break;
+			    					case 1:
+				    					e['checkStatus']='不合格';
+				    					e['ischeck']=true;
+				    					break;
+			    				}
+		    					break;
+	    				}
+	    				
+	    				switch (e['reBuy']) {
+	    					case 0:
+	    						e['reBuy']='否'
+		    					break;
+	    					case 1:
+	    						e['reBuy']='复购'
+		    					e['isreBuy']=true;
+		    					break;
+	    				}
+
+	    				switch (e['refund']) {
+	    					case 0:
+	    						e['refund']=''
+		    					break;
+	    					case 1:
+	    						e['refund']='退款中'
+	    						if (e['status']!='交易关闭') {
+	    							a1++;
+		    					}
+		    					break;
+		    				case 2:
+	    						e['refund']='退款成功'
+	    						// if (e['status']!='交易关闭') {
+	    							a2++;
+		    					// }
+		    					break;
+	    				}
+
+	    				switch (e['sellerFlag']) {
+	    					case 1:
+		    					if (e['status']!='交易关闭') {
+	    							a4++;
+		    					}
+		    					break;
+		    				case 2:
+	    						if (e['status']!='交易关闭') {
+	    							a5++;
+		    					}
+		    					break;
+		    				case 3:
+	    						if (e['status']!='交易关闭') {
+	    							a6++;
+		    					}
+		    					break;
+		    				case 4:
+	    						if (e['status']!='交易关闭') {
+	    							a7++;
+		    					}
+		    					break;
+		    				case 5:
+	    						if (e['status']!='交易关闭') {
+	    							a8++;
+		    					}
+		    					break;
+	    				}
+	    			}
+    				_this.gridData = arr
+    				_this.a1=a1
+    				_this.a2=a2
+    				_this.a3=a3
+    				_this.a4=a4
+    				_this.a5=a5
+    				_this.a6=a6
+    				_this.a7=a7
+    				_this.a8=a8
+	    		})
+			},
+			onCopy(Url2) {
+        	 	var oInput = document.createElement('input');
+		        oInput.value = Url2;
+		        document.body.appendChild(oInput);
+		        oInput.select(); // 选择对象
+		        document.execCommand("Copy"); // 执行浏览器复制命令
+		        oInput.className = 'oInput';
+		        oInput.style.display='none';
+		        this.$message({
+		          message: '复制成功',
+		          type: 'success'
+		        });
+	        },
+	        switchChange() {
+	        	var _this = this
+	        	if (_this.value3) {
+	        		_this.t = setInterval(function(){
+						_this.getData()
+					},30000)
+	        	} else {
+	        		clearInterval(_this.t)
+	        	}
+	        },
+	        popoverShow(row) {
+	        	console.log(row)
+	        	this.loadingpopover = true
+	        	this.datapopover = []
+				var _this = this;
+	    		// axios({
+	    		// 	method: 'post',
+	    		// 	// url: "http://fanbo.com/test/my/rebuylist",
+	    		// 	url: "http://www.liuliangfans.com/test/my/rebuylist",
+	    		// 	data: {
+	    		// 		row: JSON.stringify(row),
+	    		// 		oid: row.orderId
+	    		// 	}
+	    		// }).then(function(res){
+	    		// 	_this.loadingpopover=false
+	    		// 	// _this.datapopover = JSON.parse(res.data)
+	    		// 	_this.datapopover = res.data
+	    		// })
+	    		$.ajax({
+	    			url: "http://www.liuliangfans.com/test/my/rebuylist",
+			        data: {
+	    				row: JSON.stringify(row),
+	    				oid: row.orderId
+			        },
+			        type: 'post',
+			        async: true,
+			        error: function(res) {
+			        },
+			        success: function(res) {
+			        	_this.loadingpopover=false
+	    				_this.datapopover = res
+			        }
+	    		})
+	        }
+		},
+		mounted() {
+			var _this=this
+			_this.getData()
+			_this.t = setInterval(function(){
+				_this.getData()
+			},30000)
+
+		}
+	})
+</script>
+<style type="text/css">
+	body {
+		margin: 0;
+		/*max-width: 1700px;*/
+		background-color: rgb(244,244,244);
+	}
+	.el-table tr:first-child th {
+		background-color: rgb(246,248,250);
+		/*background-color: #ff9000;*/
+		border-right: none;
+		color: #454a51;
+		/*color: white;*/
+		font-weight: 700;
+		font-size: 14px;
+		/*border-top: 1px solid #d1d5de;
+    	border-bottom: 1px solid #d1d5de;*/
+    	padding: 5px 0px 4px 0px;
+	}
+	.el-table tr:first-child th div {
+		border-left: 1px solid #d1d5de;
+		/*border-left: 1px solid white;*/
+	}
+	.el-table tr:first-child th:first-child div {
+		border-left: none;
+	}
+	.el-table--border td {
+		border-right: none;
+	}
+	.el-table--enable-row-transition .el-table__body td {
+	     -webkit-transition: none;
+	     transition: none;
+	}
+	.el-table .cell {
+   		white-space: nowrap;
+   	}
+   	.ischeckred {
+   		color: red;
+   	}
+   	.isrebuyred {
+   		color: red;
+   		cursor: pointer;
+   	}
+   	.istbkorderblue {
+   		color:#409EFF;
+   	}
+   	.el-table .warning-row {
+	    background: red;
+	    color: white;
+	  }
+
+	  .el-table .success-row {
+	    background: #409EFF;
+	    color: white;
+	  }
+
+	  .el-table .success-rowrebuy {
+	    background: rgb(255,137,0);
+	    color: white;
+	  }
+
+
+	  .el-table .warning-row:hover {
+	    color: black;
+	  }
+
+	  .el-table .success-row:hover {
+	    color: black;
+	  }
+	  .el-table .success-rowrebuy:hover {
+	    color: black;
+	  }
+	  .el-button--text {
+	    color: #006eff;
+	}
+	.poptable{
+		padding: 1px 0px!important;
+	}
+	.el-popover {
+		border: 2px solid #F94A14;
+    	box-shadow: 2px 2px 0 #dcdadb;
+	}
+	.topdiv {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		background-color: #F5F5F5;
+		height: 35px;
+		color:#6C6C6C;
+		font-size: 14px;
+	}
+	.posdiv {
+		/*background-image: linear-gradient(to right,#ff9000 0,#ff5000 100%);*/
+		background-color: #ff9000;
+		background-color: white;
+	    height: 32px;
+	    position: absolute;
+	    top: 36px;
+	    width: 100%;
+	}
+	.span1038 {
+		padding: 0 10px;
+	}
+	.span1038 strong {
+		color: red;
+	}
+</style>
