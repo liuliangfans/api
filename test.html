@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.4.11/theme-chalk/index.css" rel="stylesheet">
 	<script src="https://cdn.bootcss.com/vue/2.5.17/vue.js"></script>
-	<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 	<link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 	<link rel="icon" href="/public/img/logo33.png" type="image/x-icon"/>
 	<title>订单列表</title>
@@ -14,7 +14,7 @@
 	<div id="app">
 		<template>
 			<!-- <el-button size='mini' plain style='width: 150px;margin-bottom: 10px;' @click='getData()'>刷新</el-button> -->
-			<div class="topdiv" style="border-bottom: 2px solid white;min-width: 1000px">
+			<div class="topdiv" style="border-bottom: 2px solid white">
 				<div class="topdiv">
 					<span style="padding-right: 20px">自动刷新</span>
 					<el-switch v-model="value3" @change='switchChange'></el-switch>
@@ -165,7 +165,7 @@
 	    		axios({
 	    			method: 'post',
 	    			// url: "http://fanbo.com/test/my",
-	    			url: "http://www.liuliangfans.com/test/my",
+	    			url: "https://wx.tao-liuliang.com/index.php/index/index/index1",
 	    		}).then(function(res){
 	    			_this.loading = false
 	    			var arr = res.data
@@ -341,7 +341,7 @@
 	    		// 	_this.datapopover = res.data
 	    		// })
 	    		$.ajax({
-	    			url: "http://www.liuliangfans.com/test/my/rebuylist",
+	    			url: "https://wx.tao-liuliang.com/index.php/index/index/rebuylist",
 			        data: {
 	    				row: JSON.stringify(row),
 	    				oid: row.orderId
