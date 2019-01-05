@@ -13,61 +13,92 @@
 <body>
 	<div id="app">
 		<template>
-			<!-- <el-button size='mini' plain style='width: 150px;margin-bottom: 10px;' @click='getData()'>刷新</el-button> -->
-			<div class="topdiv" style="border-bottom: 2px solid white">
-				<div class="topdiv">
-					<span style="padding-right: 20px">自动刷新</span>
-					<el-switch v-model="value3" @change='switchChange'></el-switch>
-					<span style="padding-left: 10px;color:red">{{value3?'开':'关'}}</span>
-				</div>
-				<div v-if='gridData.length>0'>
+			<div class="topdiv" style="border-bottom: 2px solid white;min-width: 1200px">
+				<transition name="el-zoom-in-bottom">
+					<div class="topdiv" v-show='animationshow'>
+						<span style="padding-right: 20px">自动刷新</span>
+						<el-switch v-model="value3" @change='switchChange' active-color="#4285F4"></el-switch>
+						<span style="padding-left: 10px;color:#EA4335">{{value3?'开':'关'}}</span>
+					</div>
+				</transition>
+				<transition name="el-zoom-in-bottom">
+					<div class="topdiv" style="font-size: 22px" v-show='animationshow1'>
+						<span>昨日订单 <span v-if='count!=0'><strong style="color: red">{{count}}</strong> 单</span></span>
+					</div>
+				</transition>
+				<div v-if='gridData.length>0' style="display: flex;align-items: center;margin-right: 2px;">
+					<span class="span1038">待发货 <strong>{{b1}}</strong> </span>
 					<span class="span1038">退款中 <strong>{{a1}}</strong> </span>
 					<span class="span1038">退款成功 <strong>{{a2}}</strong> </span>
-					<span class="span1038" style="padding-right: 50px;">淘客订单 <strong>{{a3}}</strong> </span>
-					<span class="span1038">
-						<i class="fa fa-flag" style="color:#FD0000"></i>红旗 <span>{{a4}}</span> 
-					</span>
-					<span class="span1038">
-						<i class="fa fa-flag" style="color:#FDF802"></i>黄旗 <span>{{a5}}</span> 
-					</span>
-					<span class="span1038">
-						<i class="fa fa-flag" style="color:#00FD28"></i>绿旗 <span>{{a6}}</span> 
-					</span>
-					<span class="span1038">
-						<i class="fa fa-flag" style="color:#0050FC"></i>蓝旗 <span>{{a7}}</span> 
-					</span>
-					<span class="span1038">
-						<i class="fa fa-flag" style="color:#E101FD"></i>紫旗 <span>{{a8}}</span> 
-					</span>
+					<span class="span1038">淘客订单 <strong>{{a3}}</strong> </span>
+					<span class="span1038" style="padding-right: 100px;">复购数 <strong>{{b2}}</strong> </span>
+					<buy_jifen a='fhui' b='lhui' flag='灰旗' :color='{color: "gray"}' :num='a9' 
+					:money='a9money' :taokenum='a9_tao'>
+						
+					</buy_jifen>
+					<buy_jifen a='fhong' b='lhong' flag='红旗' :color='{color: "#EA4335"}' :num='a4' 
+					:money='a4money' :taokenum='a4_tao'>
+						
+					</buy_jifen>
+					<buy_jifen a='fhuang' b='lhuang' flag='黄旗' :color='{color: "#FBBC05"}' :num='a5' 
+					:money='a5money' :taokenum='a5_tao'>
+						
+					</buy_jifen>
+					<buy_jifen a='flv' b='llv' flag='绿旗' :color='{color: "#34A853"}' :num='a6' 
+					:money='a6money' :taokenum='a6_tao'>
+						
+					</buy_jifen>
+					<buy_jifen a='flan' b='llan' flag='蓝旗' :color='{color: "#4285F4"}' :num='a7' 
+					:money='a7money' :taokenum='a7_tao'>
+						
+					</buy_jifen>
+					<buy_jifen a='fzi' b='lzi' flag='紫旗' :color='{color: "#E101FD"}' :num='a8' 
+					:money='a8money' :taokenum='a8_tao'>
+						
+					</buy_jifen>
 				</div>
 			</div>
-			<!-- <div class='posdiv'></div> -->
 			<div style="max-width: 1700px;margin: 0 auto">
-				<el-table :data="gridData" border style="width: 100%;" v-loading='loading' size='mini' 
-				:row-class-name="tableRowClassName" height='860px'>
+				<el-table :data="gridData" border style="width: 100%;" v-loading='loading' size='mini' height='860px'>
 					    <el-table-column prop="id" label="编号" align='center' width=100px></el-table-column>
 					    <el-table-column prop="createTime" label="创建时间" align='center' min-width=200px></el-table-column>
 					    <el-table-column prop="buyerNick" label="买家旺旺"  min-width=200px :show-overflow-tooltip=true>
 					    	<template scope="scope">
 					    		{{scope.row.buyerNick}}
-					    		<el-button @click='onCopy(scope.row.buyerNick)' size='mini' type="text">复制</el-button>
+					    		<i title="复制" class="fa fa-clone" style="cursor: pointer;color: #4285F4" @click='onCopy(scope.row.buyerNick)'></i>
 					    	</template>
 					    </el-table-column>
 					    <el-table-column prop="orderId" label="订单号" align='center' min-width=200px>
 					    	<template scope="scope">
 					    		{{scope.row.orderId}}
-					    		<el-button @click='onCopy(scope.row.orderId)' size='mini' type="text">复制</el-button>
+					    		<i title="复制" class="fa fa-clone" style="cursor: pointer;color: #4285F4" @click='onCopy(scope.row.orderId)'></i>
 					    	</template>
 					    </el-table-column>
 					    <el-table-column prop="status" label="订单状态"  align='center' width=120px>
 					    	<template scope="scope">
-					    		<span v-if='scope.row.status=="交易关闭"' style="color:#FD0000">{{scope.row.status}}</span>
-					    		<span v-else-if='scope.row.status=="买家已付款"' style="color:#0050FC">{{scope.row.status}}</span>
-					    		<span v-else-if='scope.row.status=="等待买家付款"' style="color:#56AA16">{{scope.row.status}}</span>
+					    		<span v-if='scope.row.status=="交易关闭"' style="color:#EA4335">{{scope.row.status}}</span>
+					    		<span v-else-if='scope.row.status=="买家已付款"' style="color:#4285F4">{{scope.row.status}}</span>
+					    		<span v-else-if='scope.row.status=="等待买家付款"' style="color:#34A853">{{scope.row.status}}</span>
 					    		<span v-else>{{scope.row.status}}</span>
 					    	</template>
 					    </el-table-column>
-					    <el-table-column prop="actualFee" label="实收款"  align='center' width=80px></el-table-column>
+					    <el-table-column prop="actualFee" label="应收款"  align='center' width=80px></el-table-column>
+					    <el-table-column prop="invoiceAmt" label="实收金额"  align='center'>
+					    	<template scope="scope">
+					    		<span style="color:#EA4335;padding: 1px 5px" 
+					    		:style='scope.row.invoiceAmt!=scope.row.actualFee&&
+					    		(scope.row.status=="买家已付款"||scope.row.status=="卖家已发货")
+					    		?{border: "1px solid #EA4335", fontSize: "14px", background: "#FEF0F0"}:{}'>
+					    			{{scope.row.invoiceAmt}}
+					    		</span>
+					    	</template>
+					    </el-table-column>
+					    <el-table-column prop="serviceAmt" label="积分抵扣金额"  align='center' min-width=120px>
+					    	<template scope="scope">
+					    		<span v-if='scope.row.serviceAmt!=0' style="color:#EA4335">{{scope.row.serviceAmt}}</span>
+					    		<!-- <span v-else>{{scope.row.serviceAmt}}</span> -->
+					    	</template>
+					    </el-table-column>
 					    <el-table-column prop="quantity" label="数量"  align='center' width=80px></el-table-column>
 					    <el-table-column prop="refund" label="退款状态"  align='center'></el-table-column>
 					    <el-table-column prop="checkStatus" label="验号状态"  align='center'>
@@ -78,8 +109,8 @@
 					    <el-table-column prop="checkMemo" label="验号备注"  align='center'></el-table-column>
 					    <el-table-column prop="tbk_order" label="淘客检测"  align='center'>
 					    	<template scope="scope">
-					    		<span v-if='scope.row.tbk_order=="初检正常"' style="color:#56AA16">{{scope.row.tbk_order}}</span>
-					    		<span v-else-if='scope.row.tbk_order=="淘客订单"' style="color:#409EFF">{{scope.row.tbk_order}}</span>
+					    		<span v-if='scope.row.tbk_order=="初检正常"' style="color:#34A853">{{scope.row.tbk_order}}</span>
+					    		<span v-else-if='scope.row.tbk_order=="淘客订单"' style="color:#4285F4">{{scope.row.tbk_order}}</span>
 					    		<span v-else>{{scope.row.tbk_order}}</span>
 					    	</template>
 					    </el-table-column>
@@ -111,22 +142,77 @@
 					    </el-table-column>
 					    <el-table-column prop="sellerFlag" label="旗帜标识"  align='center' width=80px>
 					    	<template scope="scope">
-					    		<i class="fa fa-flag" style="color:#FD0000" v-if='scope.row.sellerFlag==1'></i>
-					    		<i class="fa fa-flag" style="color:#FDF802" v-if='scope.row.sellerFlag==2'></i>
-					    		<i class="fa fa-flag" style="color:#00FD28" v-if='scope.row.sellerFlag==3'></i>
-					    		<i class="fa fa-flag" style="color:#0050FC" v-if='scope.row.sellerFlag==4'></i>
+					    		<i class="fa fa-flag" style="color:#EA4335" v-if='scope.row.sellerFlag==1'></i>
+					    		<i class="fa fa-flag" style="color:#FBBC05" v-if='scope.row.sellerFlag==2'></i>
+					    		<i class="fa fa-flag" style="color:#34A853" v-if='scope.row.sellerFlag==3'></i>
+					    		<i class="fa fa-flag" style="color:#4285F4" v-if='scope.row.sellerFlag==4'></i>
 					    		<i class="fa fa-flag" style="color:#E101FD" v-if='scope.row.sellerFlag==5'></i>
 					    	</template>
 					    </el-table-column>
 				</el-table>
+				<div style="height: 35px;display: flex;align-items: center;">
+					<a href="javascript:void(0)" @click='qqqqq'>
+						{{animationshow?'查看昨日订单':'返回今日订单'}}
+					</a>
+				</div>
 			</div>
 		</template>
 	</div>
+	<template id="buy_jifen">
+		<div style="position: relative;height: 35px;line-height: 35px;margin-right: 100px">
+			<div :class="hehe" style="position: absolute; width: 100px;text-align: center;border: 1px solid rgb(245,245,245);height: 35px;top: -1px;">
+				<i class="fa fa-flag" :style="color"></i>{{flag}} <span>{{num}}</span><i class="el-icon-arrow-down ii20181227"></i>
+			</div>
+
+				
+			<div :class="xixi" style="position:absolute;display: none;z-index: 99">
+				<div style="position: relative;">
+					<div style="position: absolute;width: 100px; background-color: white;text-align: center;border: 1px solid #ccc;border-bottom-color: white;z-index: 888;height: 35px;top: -1px;">
+						<i class="fa fa-flag" :style="color"></i>{{flag}} <span>{{num}}</span><i class="el-icon-arrow-up ii20181227"></i>
+					</div>
+					<div style="position: absolute;top: 35px;background-color: white; width: 100px;box-shadow: 0 3px 3px rgba(0,0,0,.1);border: 1px solid #ccc;">
+						<p style="padding-left: 10px;line-height: initial;margin: 7px 0">
+							<span style="font-size: 12px;">￥</span><span style="font-size: 16px;color:#EA4335">{{money}}</span>
+						</p>
+						<p style="padding-left: 10px;line-height: initial;margin: 7px 0">
+							<span style="font-size: 12px;padding-right: 5px">淘客数</span><span style="font-size: 16px;color:#EA4335">{{taokenum}}</span>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</template>
 </body>
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.4.11/index.js"></script>
 <script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
 <script type="text/javascript">
+	Vue.component('buy_jifen', {
+		template: '#buy_jifen',
+		props: ['a', 'b', 'flag', 'color', 'num', 'money', 'taokenum'],
+		data: function() {
+			return {
+				hehe: this.a,
+				xixi: this.b
+			}
+		},
+		methods: {
+			
+		},
+		mounted: function() {
+			var _this=this
+			$('.'+this.a).hover(function(){
+    			$('.'+_this.b).css('display', 'block')
+    		})
+
+    		$('.'+this.b).hover(function(){}, function(){
+				$('.'+_this.b).css('display', 'none')
+    		})
+		}
+	})
+
+
+
 	new Vue({
 		el: '#app',
 		data: function() {
@@ -137,6 +223,11 @@
 		   		gridData: [],
 		   		loadingpopover: false,
 		   		datapopover: [],
+		   		animationshow: true,
+		   		animationshow1: false,
+		   		count: 0,
+		   		b1: 0, // 待发货
+		   		b2: 0, // 复购数
 		   		a1: 0, // 退款中
 		   		a2: 0, // 退款成功
 		   		a3: 0, // 淘客订单
@@ -145,161 +236,307 @@
 		   		a6: 0, // 绿旗
 		   		a7: 0, // 蓝旗
 		   		a8: 0, // 紫旗
+		   		a9: 0, // 灰旗
+		   		a4money: 0, // 红旗总金额
+		   		a5money: 0, // 黄旗总金额
+		   		a6money: 0, // 绿旗总金额
+		   		a7money: 0, // 蓝旗总金额
+		   		a8money: 0, // 紫旗总金额
+		   		a9money: 0, // 灰旗总金额
+		   		a4_tao: 0, //红旗下的淘客数
+		   		a5_tao: 0, //黄旗下的淘客数
+		   		a6_tao: 0, //绿旗下的淘客数
+		   		a7_tao: 0, //蓝旗下的淘客数
+		   		a8_tao: 0, //紫旗下的淘客数
+		   		a9_tao: 0, //灰旗下的淘客数
 		   }
 		},
 		methods: {
-			tableRowClassName({row, rowIndex}) {
-		        // if (row['ischeck']) {
-		        //   return 'warning-row';
-		        // } else if (row['istbkorder']) {
-		        //   return 'success-row';
-		        // }else if (row['isreBuy']) {
-		        //   return 'success-rowrebuy';
-		        // }
-		        // return '';
-		      },
-			getData() {
+			qqqqq: function() {
+				var _this=this
+				if (this.animationshow) {
+					this.animationshow = !this.animationshow
+					this.getData('yesterday')
+					clearInterval(_this.t)
+					setTimeout(function(){
+						_this.animationshow1=!_this.animationshow1
+					},300)
+				} else {
+					this.animationshow1 = !this.animationshow1
+					this.getData('today')
+					if (_this.value3) {
+		        		_this.t = setInterval(function(){
+							_this.getData('today')
+						},30000)
+		        	} else {
+		        		clearInterval(_this.t)
+		        	}
+					setTimeout(function(){
+						_this.animationshow=!_this.animationshow
+					},300)
+				}
+			},
+			getData: function(tag) {
 				this.loading = true
 	        	this.gridData = []
+	        	this.count=0
 				var _this = this;
-	    		axios({
-	    			method: 'post',
+				$.ajax({
 	    			// url: "http://fanbo.com/test/my",
-	    			url: "https://wx.tao-liuliang.com/index.php/index/index/index1",
-	    		}).then(function(res){
-	    			_this.loading = false
-	    			var arr = res.data
-	    			var a1 = 0;
-	    			var a2 = 0;
-	    			var a3 = 0;
-	    			var a4 = 0;
-	    			var a5 = 0;
-	    			var a6 = 0;
-	    			var a7 = 0;
-	    			var a8 = 0;
-	    			for (let e of arr) {
-	    				switch (e['tbk_check_num']) {
-	    					case 0:
-	    						e['tbk_order']='正在检测...';
-	    						break;
-	    					case 1:
-			    				switch (e['tbk_order']) {
-			    					case 0:
-			    						e['tbk_order']='初检正常';
-			    						break;
-			    					case 1:
-			    						e['tbk_order']='淘客订单';
-			    						e['istbkorder']=true;
-			    						if (e['status']!='交易关闭') {
-			    							a3++;
-				    					}
-			    						break;
-			    				}
-	    						
-	    						break;
-	    					case 2:
-	    						switch (e['tbk_order']) {
-			    					case 0:
-			    						e['tbk_order']='完全正常';
-			    						break;
-			    					case 1:
-			    						e['tbk_order']='淘客订单';
-			    						e['istbkorder']=true;
-			    						if (e['status']!='交易关闭') {
-			    							a3++;
-				    					}
-			    						break;
-	    						}
-	    						break;
-	    					default:
-	    						break;
-	    				}
-	    				
-	    				switch (e['check_num']) {
-	    					case 0:
-		    					e['checkStatus']='正在验号...';
-		    					break;
-	    					default:
-		    					switch (e['checkStatus']) {
-			    					case 0:
-				    					e['checkStatus']='正常';
-				    					break;
-			    					case 1:
-				    					e['checkStatus']='不合格';
-				    					e['ischeck']=true;
-				    					break;
-			    				}
-		    					break;
-	    				}
-	    				
-	    				switch (e['reBuy']) {
-	    					case 0:
-	    						e['reBuy']='否'
-		    					break;
-	    					case 1:
-	    						e['reBuy']='复购'
-		    					e['isreBuy']=true;
-		    					break;
-	    				}
+	    			url: "https://wx.tao-liuliang.com/index.php/test/my",
+			        data: {
+	    				tag: tag
+			        },
+			        type: 'post',
+			        async: true,
+			        error: function(res) {
+			        },
+			        success: function(res) {
+			        	_this.loading = false
+		    			var arr = res
+		    			var b1 = 0;
+		    			var b2 = 0;
+		    			var a1 = 0;
+		    			var a2 = 0;
+		    			var a3 = 0;
+		    			var a4 = 0;
+		    			var a5 = 0;
+		    			var a6 = 0;
+		    			var a7 = 0;
+		    			var a8 = 0;
+		    			var a9 = 0;
+		    			var a4money = 0;
+		    			var a5money = 0;
+		    			var a6money = 0;
+		    			var a7money = 0;
+		    			var a8money = 0;
+		    			var a9money = 0;
+		    			var a4_tao = 0;
+		    			var a5_tao = 0;
+		    			var a6_tao = 0;
+		    			var a7_tao = 0;
+		    			var a8_tao = 0;
+		    			var a9_tao = 0;
+		    			for (var i = 0; i < arr.length; i++) {
+		    				var e = arr[i];
+		    				switch (e['tbk_check_num']) {
+		    					case 0:
+		    						e['tbk_order_unset'] = e['tbk_order']
+		    						e['tbk_order']='正在检测...';
+		    						break;
+		    					case 1:
+				    				switch (e['tbk_order']) {
+				    					case 0:
+				    						e['tbk_order_unset'] = e['tbk_order']
+				    						e['tbk_order']='初检正常';
+				    						break;
+				    					case 1:
+				    						e['tbk_order_unset'] = e['tbk_order']
+				    						e['tbk_order']='淘客订单';
+				    						e['istbkorder']=true;
+				    						if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+				    							a3++;
+					    					}
+				    						break;
+				    				}
+		    						
+		    						break;
+		    					case 2:
+		    						switch (e['tbk_order']) {
+				    					case 0:
+				    						e['tbk_order_unset'] = e['tbk_order']
+				    						e['tbk_order']='完全正常';
+				    						break;
+				    					case 1:
+				    						e['tbk_order_unset'] = e['tbk_order']
+				    						e['tbk_order']='淘客订单';
+				    						e['istbkorder']=true;
+				    						if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+				    							a3++;
+					    					}
+				    						break;
+		    						}
+		    						break;
+		    					default:
+		    						break;
+		    				}
+		    				
+		    				switch (e['check_num']) {
+		    					case 0:
+			    					e['checkStatus']='正在验号...';
+			    					break;
+		    					default:
+			    					switch (e['checkStatus']) {
+				    					case 0:
+					    					e['checkStatus']='正常';
+					    					break;
+				    					case 1:
+					    					e['checkStatus']='不合格';
+					    					e['ischeck']=true;
+					    					break;
+				    				}
+			    					break;
+		    				}
+		    				
+		    				switch (e['reBuy']) {
+		    					case 0:
+		    						e['reBuy']='否'
+			    					break;
+		    					case 1:
+		    						e['reBuy']='复购'
+			    					e['isreBuy']=true;
+			    					if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+		    							b2++;
+			    					}
+			    					break;
+		    				}
 
-	    				switch (e['refund']) {
-	    					case 0:
-	    						e['refund']=''
-		    					break;
-	    					case 1:
-	    						e['refund']='退款中'
-	    						if (e['status']!='交易关闭') {
-	    							a1++;
-		    					}
-		    					break;
-		    				case 2:
-	    						e['refund']='退款成功'
-	    						// if (e['status']!='交易关闭') {
-	    							a2++;
-		    					// }
-		    					break;
-	    				}
+		    				switch (e['refund']) {
+		    					case 0:
+		    						e['refund']=''
+		    						if (e['status']=='买家已付款') {
+		    							b1++;
+		    						}
+			    					break;
+		    					case 1:
+		    						e['refund']='退款中'
+		    						if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+		    							a1++;
+			    					}
+			    					break;
+			    				case 2:
+		    						e['refund']='退款成功'
+		    						// if (e['status']!='交易关闭') {
+		    							a2++;
+			    					// }
+			    					break;
+		    				}
 
-	    				switch (e['sellerFlag']) {
-	    					case 1:
-		    					if (e['status']!='交易关闭') {
-	    							a4++;
-		    					}
-		    					break;
-		    				case 2:
-	    						if (e['status']!='交易关闭') {
-	    							a5++;
-		    					}
-		    					break;
-		    				case 3:
-	    						if (e['status']!='交易关闭') {
-	    							a6++;
-		    					}
-		    					break;
-		    				case 4:
-	    						if (e['status']!='交易关闭') {
-	    							a7++;
-		    					}
-		    					break;
-		    				case 5:
-	    						if (e['status']!='交易关闭') {
-	    							a8++;
-		    					}
-		    					break;
-	    				}
-	    			}
-    				_this.gridData = arr
-    				_this.a1=a1
-    				_this.a2=a2
-    				_this.a3=a3
-    				_this.a4=a4
-    				_this.a5=a5
-    				_this.a6=a6
-    				_this.a7=a7
-    				_this.a8=a8
+		    				switch (e['sellerFlag']) {
+		    					case 1:
+			    					if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+		    							a4++;
+		    							a4money+=e['actualFee']
+		    							if (_this.helper(e['tbk_check_num'], e['tbk_order_unset'], e['status'])==true) {
+		    								a4_tao++;
+		    							}
+			    					}
+			    					break;
+			    				case 2:
+		    						if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+		    							a5++;
+		    							a5money+=e['actualFee']
+		    							if (_this.helper(e['tbk_check_num'], e['tbk_order_unset'], e['status'])==true) {
+		    								a5_tao++;
+		    							}
+			    					}
+			    					break;
+			    				case 3:
+		    						if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+		    							a6++;
+		    							a6money+=e['actualFee']
+		    							if (_this.helper(e['tbk_check_num'], e['tbk_order_unset'], e['status'])==true) {
+		    								a6_tao++;
+		    							}
+			    					}
+			    					break;
+			    				case 4:
+		    						if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+		    							a7++;
+		    							a7money+=e['actualFee']
+		    							if (_this.helper(e['tbk_check_num'], e['tbk_order_unset'], e['status'])==true) {
+		    								a7_tao++;
+		    							}
+			    					}
+			    					break;
+			    				case 5:
+		    						if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+		    							a8++;
+		    							a8money+=e['actualFee']
+		    							if (_this.helper(e['tbk_check_num'], e['tbk_order_unset'], e['status'])==true) {
+		    								a8_tao++;
+		    							}
+			    					}
+			    					break;
+			    				case 0:
+		    						if (e['status']!='交易关闭'&&e['status']!='等待买家付款') {
+		    							a9++;
+		    							a9money+=e['actualFee']
+		    							if (_this.helper(e['tbk_check_num'], e['tbk_order_unset'], e['status'])==true) {
+		    								a9_tao++;
+		    							}
+			    					}
+			    					break;
+		    				}
+		    			}
+	    				_this.gridData = arr
+	    				_this.count = arr.length
+	    				_this.b1=b1
+	    				_this.b2=b2
+	    				_this.a1=a1
+	    				_this.a2=a2
+	    				_this.a3=a3
+	    				_this.a4=a4
+	    				_this.a5=a5
+	    				_this.a6=a6
+	    				_this.a7=a7
+	    				_this.a8=a8
+	    				_this.a9=a9
+	    				_this.a4money=a4money.toFixed(2)
+	    				_this.a5money=a5money.toFixed(2)
+	    				_this.a6money=a6money.toFixed(2)
+	    				_this.a7money=a7money.toFixed(2)
+	    				_this.a8money=a8money.toFixed(2)
+	    				_this.a9money=a9money.toFixed(2)
+	    				_this.a4_tao=a4_tao
+	    				_this.a5_tao=a5_tao
+	    				_this.a6_tao=a6_tao
+	    				_this.a7_tao=a7_tao
+	    				_this.a8_tao=a8_tao
+	    				_this.a9_tao=a9_tao
+			        }
 	    		})
+	    		
 			},
-			onCopy(Url2) {
+			helper: function(tbk_check_num, tbk_order, status) {
+				var isok = false;
+				switch (tbk_check_num) {
+					case 0:
+						tbk_order='正在检测...';
+						break;
+					case 1:
+	    				switch (tbk_order) {
+	    					case 0:
+	    						tbk_order='初检正常';
+	    						break;
+	    					case 1:
+	    						tbk_order='淘客订单';
+	    						if (status!='交易关闭'&&status!='等待买家付款') {
+	    							isok = true;
+		    					}
+	    						break;
+	    				}
+						
+						break;
+					case 2:
+						switch (tbk_order) {
+	    					case 0:
+	    						tbk_order='完全正常';
+	    						break;
+	    					case 1:
+	    						tbk_order='淘客订单';
+	    						if (status!='交易关闭'&&status!='等待买家付款') {
+	    							isok = true;
+		    					}
+	    						break;
+						}
+						break;
+					default:
+						break;
+				}
+				return isok;
+			},
+			onCopy: function(Url2) {
         	 	var oInput = document.createElement('input');
 		        oInput.value = Url2;
 		        document.body.appendChild(oInput);
@@ -312,36 +549,24 @@
 		          type: 'success'
 		        });
 	        },
-	        switchChange() {
+	        switchChange: function() {
 	        	var _this = this
 	        	if (_this.value3) {
 	        		_this.t = setInterval(function(){
-						_this.getData()
+						_this.getData('today')
 					},30000)
 	        	} else {
 	        		clearInterval(_this.t)
 	        	}
 	        },
-	        popoverShow(row) {
+	        popoverShow: function(row) {
 	        	console.log(row)
 	        	this.loadingpopover = true
 	        	this.datapopover = []
 				var _this = this;
-	    		// axios({
-	    		// 	method: 'post',
-	    		// 	// url: "http://fanbo.com/test/my/rebuylist",
-	    		// 	url: "http://www.liuliangfans.com/test/my/rebuylist",
-	    		// 	data: {
-	    		// 		row: JSON.stringify(row),
-	    		// 		oid: row.orderId
-	    		// 	}
-	    		// }).then(function(res){
-	    		// 	_this.loadingpopover=false
-	    		// 	// _this.datapopover = JSON.parse(res.data)
-	    		// 	_this.datapopover = res.data
-	    		// })
 	    		$.ajax({
-	    			url: "https://wx.tao-liuliang.com/index.php/index/index/rebuylist",
+	    			// url: "http://fanbo.com/test/my/rebuylist",
+	    			url: "https://wx.tao-liuliang.com/index.php/test/my/rebuylist",
 			        data: {
 	    				row: JSON.stringify(row),
 	    				oid: row.orderId
@@ -357,11 +582,11 @@
 	    		})
 	        }
 		},
-		mounted() {
+		mounted: function() {
 			var _this=this
-			_this.getData()
+			_this.getData('today')
 			_this.t = setInterval(function(){
-				_this.getData()
+				_this.getData('today')
 			},30000)
 
 		}
@@ -403,14 +628,14 @@
    		white-space: nowrap;
    	}
    	.ischeckred {
-   		color: red;
+   		color: #EA4335;
    	}
    	.isrebuyred {
-   		color: red;
+   		color: #EA4335;
    		cursor: pointer;
    	}
    	.istbkorderblue {
-   		color:#409EFF;
+   		color:#34A853;
    	}
    	.el-table .warning-row {
 	    background: red;
@@ -470,6 +695,32 @@
 		padding: 0 10px;
 	}
 	.span1038 strong {
-		color: red;
+		color: #EA4335;
+	}
+	.ii20181227 {
+		font-size: 10px;
+		margin-left: 2px;
+		color: black!important;
+		-webkit-transform-origin-x: 0;
+	    -webkit-transform: scale(0.8);
+	    transform: scale(0.8);
+	}
+	a:link {
+		color: #5f6368;
+		text-decoration: none;
+	}
+	a:visited {
+		color: #5f6368;
+		text-decoration: none;
+	}
+	a:hover {
+		color: #5f6368;
+		text-decoration: underline;	
+	}
+	a:active {
+		color: #dd4b39;
+    	text-decoration: underline;
 	}
 </style>
+
+
